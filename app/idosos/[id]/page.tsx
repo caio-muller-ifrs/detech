@@ -5,9 +5,166 @@ import { ResidentActions } from "../../../components/resident-actions";
 import { Sidebar } from "../../../components/sidebar";
 import { getMedications, getResident } from "../../../lib/db";
 
-function formatDate(value: string) { return new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "long", year: "numeric" }).format(new Date(`${value}T12:00:00`)); }
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("pt-BR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  }).format(new Date(`${value}T12:00:00`));
+}
 
-export default async function ResidentPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params; const resident = getResident(Number(id)); if (!resident) notFound(); const medications = getMedications(resident.id); const initials = resident.full_name.split(" ").slice(0, 2).map((part) => part[0]).join("");
-  return <div className="flex min-h-screen bg-paper"><Sidebar /><main className="min-w-0 flex-1 px-5 py-6 sm:px-9 lg:px-12 lg:py-10"><Link href="/" className="mb-7 inline-flex items-center gap-2 text-sm font-semibold text-moss hover:underline">← Voltar para idosos</Link><section className="mb-7 overflow-hidden rounded-3xl bg-ink p-6 text-white shadow-soft sm:p-8"><div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between"><div className="flex items-center gap-5"><div className="grid h-20 w-20 place-items-center rounded-2xl bg-[#d8e8e1] text-2xl font-bold text-moss">{initials}</div><div><div className="mb-2 flex flex-wrap items-center gap-2"><span className="rounded-full bg-white/15 px-2.5 py-1 text-xs font-medium">{resident.room}</span><span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${resident.status === "Ativo" ? "bg-emerald-300 text-emerald-950" : "bg-amber-300 text-amber-950"}`}>{resident.status}</span></div><h1 className="text-2xl font-semibold tracking-tight">{resident.preferred_name ?? resident.full_name}</h1><p className="mt-1 text-sm text-slate-300">{resident.full_name}</p></div></div><ResidentActions resident={resident} /></div></section><div className="grid gap-7 xl:grid-cols-[minmax(0,1fr)_320px]"><div className="space-y-7"><MedicationSchedule medications={medications} /><section className="grid gap-5 md:grid-cols-2"><article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft"><div className="mb-4 flex items-center justify-between"><h2 className="font-semibold text-ink">Informações gerais</h2><span className="text-emerald-600">⌁</span></div><p className="text-sm leading-6 text-slate-600">{resident.general_info}</p></article><article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft"><div className="mb-4 flex items-center justify-between"><h2 className="font-semibold text-ink">Necessidades específicas</h2><span className="text-amber-500">✦</span></div><p className="text-sm leading-6 text-slate-600">{resident.specific_needs}</p></article></section></div><aside className="h-fit rounded-2xl border border-slate-200 bg-white p-6 shadow-soft"><h2 className="font-semibold text-ink">Resumo do residente</h2><dl className="mt-5 divide-y divide-slate-100 text-sm"><div className="py-3 first:pt-0"><dt className="text-xs text-slate-400">Data de nascimento</dt><dd className="mt-1 font-medium text-ink">{formatDate(resident.birth_date)}</dd></div><div className="py-3"><dt className="text-xs text-slate-400">Contato de emergência</dt><dd className="mt-1 leading-5 text-slate-600">{resident.emergency_contact}</dd></div><div className="py-3 pb-0"><dt className="text-xs text-slate-400">Última atualização</dt><dd className="mt-1 text-slate-600">{resident.updated_at}</dd></div></dl><button className="mt-6 w-full rounded-xl border border-slate-200 py-2.5 text-sm font-semibold text-slate-600">Ver histórico</button></aside></div></main></div>;
+export default async function ResidentPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  const resident = getResident(Number(id));
+
+  if (!resident) {
+    notFound();
+  }
+
+  const medications = getMedications(resident.id);
+
+  const initials = resident.full_name
+    .split(" ")
+    .slice(0, 2)
+    .map((part) => part[0])
+    .join("");
+
+  return (
+    <div className="flex min-h-screen bg-paper">
+      <Sidebar />
+
+      <main className="min-w-0 flex-1 px-5 py-6 sm:px-9 lg:px-12 lg:py-10">
+        <Link
+          href="/"
+          className="mb-7 inline-flex items-center gap-2 text-sm font-semibold text-moss hover:underline"
+        >
+          ← Voltar para idosos
+        </Link>
+
+        <section className="mb-7 overflow-hidden rounded-3xl bg-ink p-6 text-white shadow-soft sm:p-8">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex items-center gap-5">
+              <div className="grid h-20 w-20 place-items-center rounded-2xl bg-[#d8e8e1] text-2xl font-bold text-moss">
+                {initials}
+              </div>
+
+              <div>
+                <div className="mb-2 flex flex-wrap items-center gap-2">
+                  <span className="rounded-full bg-white/15 px-2.5 py-1 text-xs font-medium">
+                    {resident.room}
+                  </span>
+
+                  <span
+                    className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                      resident.status === "Ativo"
+                        ? "bg-emerald-300 text-emerald-950"
+                        : "bg-amber-300 text-amber-950"
+                    }`}
+                  >
+                    {resident.status}
+                  </span>
+                </div>
+
+                <h1 className="text-2xl font-semibold tracking-tight">
+                  {resident.preferred_name ?? resident.full_name}
+                </h1>
+
+                <p className="mt-1 text-sm text-slate-300">
+                  {resident.full_name}
+                </p>
+              </div>
+            </div>
+
+            <ResidentActions resident={resident} />
+          </div>
+        </section>
+
+        <div className="grid gap-7 xl:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="space-y-7">
+            <MedicationSchedule
+              medications={medications}
+              residentId={resident.id}
+            />
+
+            <section className="grid gap-5 md:grid-cols-2">
+              <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="font-semibold text-ink">
+                    Informações gerais
+                  </h2>
+
+                  <span className="text-emerald-600">⌁</span>
+                </div>
+
+                <p className="text-sm leading-6 text-slate-600">
+                  {resident.general_info}
+                </p>
+              </article>
+
+              <article className="rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+                <div className="mb-4 flex items-center justify-between">
+                  <h2 className="font-semibold text-ink">
+                    Necessidades específicas
+                  </h2>
+
+                  <span className="text-amber-500">✦</span>
+                </div>
+
+                <p className="text-sm leading-6 text-slate-600">
+                  {resident.specific_needs}
+                </p>
+              </article>
+            </section>
+          </div>
+
+          <aside className="h-fit rounded-2xl border border-slate-200 bg-white p-6 shadow-soft">
+            <h2 className="font-semibold text-ink">
+              Resumo do residente
+            </h2>
+
+            <dl className="mt-5 divide-y divide-slate-100 text-sm">
+              <div className="py-3 first:pt-0">
+                <dt className="text-xs text-slate-400">
+                  Data de nascimento
+                </dt>
+
+                <dd className="mt-1 font-medium text-ink">
+                  {formatDate(resident.birth_date)}
+                </dd>
+              </div>
+
+              <div className="py-3">
+                <dt className="text-xs text-slate-400">
+                  Contato de emergência
+                </dt>
+
+                <dd className="mt-1 leading-5 text-slate-600">
+                  {resident.emergency_contact}
+                </dd>
+              </div>
+
+              <div className="py-3 pb-0">
+                <dt className="text-xs text-slate-400">
+                  Última atualização
+                </dt>
+
+                <dd className="mt-1 text-slate-600">
+                  {resident.updated_at}
+                </dd>
+              </div>
+            </dl>
+
+            <button className="mt-6 w-full rounded-xl border border-slate-200 py-2.5 text-sm font-semibold text-slate-600">
+              Ver histórico
+            </button>
+          </aside>
+        </div>
+      </main>
+    </div>
+  );
 }

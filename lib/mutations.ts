@@ -30,3 +30,57 @@ export function deleteResident(id: number) {
   db.prepare("DELETE FROM medications WHERE resident_id = ?").run(id);
   return db.prepare("DELETE FROM residents WHERE id = ?").run(id).changes > 0;
 }
+
+type MedicationPayload = {
+  name?: string;
+  dosage?: string;
+  time?: string;
+  days?: string;
+  color?: string;
+};
+
+export function createMedication(residentId: number, body: MedicationPayload) {
+  const required = ["name", "dosage", "time", "days", "color"] as const;
+
+  if (required.some((field) => !body[field]?.trim())) {
+    throw new Error("Preencha todos os campos do medicamento.");
+  }
+
+  const resident = db
+    .prepare("SELECT id FROM residents WHERE id = ?")
+    .get(residentId);
+
+  if (!resident) {
+    throw new Error("Residente não encontrado.");
+  }
+
+  const result = db
+    .prepare(`
+      INSERT INTO medications (
+        resident_id,
+        name,
+        dosage,
+        time,
+        days,
+        color
+      )
+      VALUES (
+        @resident_id,
+        @name,
+        @dosage,
+        @time,
+        @days,
+        @color
+      )
+    `)
+    .run({
+      resident_id: residentId,
+      name: body.name!.trim(),
+      dosage: body.dosage!.trim(),
+      time: body.time!.trim(),
+      days: body.days!.trim(),
+      color: body.color!.trim(),
+    });
+
+  return result.lastInsertRowid;
+}
