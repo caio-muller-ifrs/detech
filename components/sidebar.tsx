@@ -1,7 +1,7 @@
 import Link from "next/link";
 
 const items = [
-  ["Visão geral", "⌂"], ["Idosos", "♙"], ["Agenda", "◷"], ["Equipe", "♧"], ["Relatórios", "▤"]
+  ["Idosos", "♙"], ["Agenda", "◷"]
 ];
 
 export function Sidebar() {
@@ -9,7 +9,7 @@ export function Sidebar() {
     <aside className="hidden min-h-screen w-64 shrink-0 flex-col border-r border-slate-200 bg-white px-4 py-6 lg:flex">
       <Link href="/" className="mb-11 flex items-center gap-3 px-3">
         <span className="grid h-10 w-10 place-items-center rounded-xl bg-moss text-xl text-white">♥</span>
-        <span><strong className="block font-semibold tracking-tight text-ink">Cuidar</strong><small className="text-slate-400">gestão humanizada</small></span>
+        <span><strong className="block font-semibold tracking-tight text-ink">Detech</strong><small className="text-slate-400">gestão humanizada</small></span>
       </Link>
       <nav className="space-y-1">
         {items.map(([label, icon]) => (
